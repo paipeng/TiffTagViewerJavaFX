@@ -1,13 +1,21 @@
 package com.paipeng.tifftagviewer.controller;
 
 import com.paipeng.tifftagviewer.utils.CommonUtils;
+import com.paipeng.tifftagviewer.utils.TiffUtils;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -16,8 +24,13 @@ public class TiffTagViewerViewController implements Initializable {
     private static Stage stage;
     private static final String FXML_FILE = "/fxml/TiffTagViewerViewController.fxml";
     private  static ResourceBundle resources;
+
+    @FXML
+    private Button selectTiffButton;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
 
     }
 
@@ -36,6 +49,24 @@ public class TiffTagViewerViewController implements Initializable {
             stage.show();
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void addImageButtonClicked(MouseEvent mouseEvent) throws IOException {
+        logger.info("addImageButtonClicked");
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter(resources.getString("selectTiff"), "tif", "tiff");
+        fileChooser.setSelectedExtensionFilter(extensionFilter);
+
+        File selectedFile = fileChooser.showOpenDialog(((Node) mouseEvent.getTarget()).getScene().getWindow());
+        if (selectedFile != null) {
+            logger.info("selected file: " + selectedFile.getAbsolutePath());
+            String imagePath = selectedFile.getAbsolutePath();
+            //drawImage(imagePath);
+            //fileNameLists.add(imagePath);
+
+            TiffUtils.readTiffTag(imagePath);
         }
     }
 }
