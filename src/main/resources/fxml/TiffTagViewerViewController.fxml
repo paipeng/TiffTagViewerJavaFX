@@ -8,10 +8,10 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.paipeng.tifftagviewer.controller.TiffTagViewerViewController">
    <children>
-      <TableView layoutX="14.0" layoutY="49.0" prefHeight="300.0" prefWidth="580.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="45.0">
+      <TableView fx:id="tiffTagTableView" layoutX="14.0" layoutY="49.0" prefHeight="300.0" prefWidth="580.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="45.0">
         <columns>
-          <TableColumn prefWidth="291.0" text="C1" />
-          <TableColumn prefWidth="288.0" text="C2" />
+          <TableColumn prefWidth="290.0" text="%tiffTagName" />
+          <TableColumn prefWidth="290.0" text="%tiffTagValue" />
         </columns>
       </TableView>
       <Button layoutX="531.0" layoutY="21.0" mnemonicParsing="false" text="%selectTiff" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" fx:id="selectTiffButton" onMouseClicked="#addImageButtonClicked"/>

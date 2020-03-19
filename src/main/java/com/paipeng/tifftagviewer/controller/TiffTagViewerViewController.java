@@ -1,7 +1,9 @@
 package com.paipeng.tifftagviewer.controller;
 
+import com.paipeng.tifftagviewer.model.TiffTag;
 import com.paipeng.tifftagviewer.utils.CommonUtils;
 import com.paipeng.tifftagviewer.utils.TiffUtils;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -9,6 +11,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -23,7 +28,10 @@ public class TiffTagViewerViewController implements Initializable {
     public static Logger logger = Logger.getLogger(WelcomeViewController.class);
     private static Stage stage;
     private static final String FXML_FILE = "/fxml/TiffTagViewerViewController.fxml";
-    private  static ResourceBundle resources;
+    private static ResourceBundle resources;
+
+    @FXML
+    private TableView tiffTagTableView;
 
     @FXML
     private Button selectTiffButton;
@@ -31,14 +39,14 @@ public class TiffTagViewerViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-
+        initTiffTagTableView();
     }
 
 
     public static void start() {
         try {
             resources = ResourceBundle.getBundle("bundles.languages", CommonUtils.getCurrentLanguageLocale());
-            Parent root = FXMLLoader.load(TiffTagViewerViewController.class.getResource(FXML_FILE),resources);
+            Parent root = FXMLLoader.load(TiffTagViewerViewController.class.getResource(FXML_FILE), resources);
 
             Scene scene = new Scene(root);
             stage = new Stage();
@@ -67,6 +75,34 @@ public class TiffTagViewerViewController implements Initializable {
             //fileNameLists.add(imagePath);
 
             TiffUtils.readTiffTag(imagePath);
+
+            updateTiffTagTableView();
         }
+    }
+
+    private void initTiffTagTableView() {
+        try {
+            TableColumn tableColumn = (TableColumn) tiffTagTableView.getColumns().get(0);
+            tableColumn.setCellValueFactory(new PropertyValueFactory<>("tagName"));
+
+            tableColumn = (TableColumn) tiffTagTableView.getColumns().get(1);
+            tableColumn.setCellValueFactory(new PropertyValueFactory<>("tagValue"));
+        } catch (NullPointerException e) {
+            logger.error(e.getMessage());
+        } catch (IndexOutOfBoundsException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void cleanTiffTagTableView() {
+        tiffTagTableView.getItems().clear();
+    }
+
+    private void updateTiffTagTableView() {
+        cleanTiffTagTableView();
+
+        TiffTag tiffTag = new TiffTag("test", "123");
+        tiffTagTableView.getItems().add(tiffTag);
+
     }
 }
