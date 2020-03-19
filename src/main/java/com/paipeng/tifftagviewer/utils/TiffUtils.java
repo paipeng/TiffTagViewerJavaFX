@@ -1,8 +1,12 @@
 package com.paipeng.tifftagviewer.utils;
 
+import com.paipeng.tifftagviewer.model.TiffTag;
 import com.twelvemonkeys.imageio.util.ProgressListenerBase;
 import com.twelvemonkeys.xml.XMLSerializer;
+import javafx.collections.ObservableList;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
@@ -20,7 +24,7 @@ import java.lang.reflect.Method;
 import java.util.Iterator;
 
 public class TiffUtils {
-    public static void readTiffTag(String imagePath) throws IOException {
+    public static Node readTiffTag(String imagePath) throws IOException {
         ImageIO.setUseCache(false);
 
         //String imagePath = "/Users/paipeng/testPDFA3.tif";
@@ -29,7 +33,7 @@ public class TiffUtils {
         ImageInputStream input = ImageIO.createImageInputStream(file);
         if (input == null) {
             System.err.println("Could not read file: " + file);
-            return;
+            return null;
         }
 
         //deregisterOSXTIFFImageReaderSpi();
@@ -38,7 +42,7 @@ public class TiffUtils {
 
         if (!readers.hasNext()) {
             System.err.println("No reader for: " + file);
-            return;
+            return null;
         }
 
         ImageReader reader = readers.next();
@@ -119,10 +123,12 @@ public class TiffUtils {
                             Node tree = metadata.getAsTree(metadata.getNativeMetadataFormatName());
                             //replaceBytesWithUndefined((IIOMetadataNode) tree);
                             new XMLSerializer(System.out, "UTF-8").serialize(tree, false);
+                            return tree;
                         }
                         /*else*/
                         if (metadata.isStandardMetadataFormatSupported()) {
                             new XMLSerializer(System.out, "UTF-8").serialize(metadata.getAsTree(IIOMetadataFormatImpl.standardMetadataFormatName), false);
+                            return metadata.getAsTree(IIOMetadataFormatImpl.standardMetadataFormatName);
                         }
                     }
 
@@ -193,6 +199,7 @@ public class TiffUtils {
                         System.err.println("Could not read thumbnails: " + e.getMessage());
                         e.printStackTrace();
                     }
+                    return null;
                 }
                 catch (Throwable t) {
                     System.err.println(file + " image " + imageNo + " can't be read:");
@@ -206,6 +213,40 @@ public class TiffUtils {
         }
         finally {
             input.close();
+        }
+        return null;
+    }
+
+    public static void updateTableView(ObservableList<Object> tagTableViewList, Node tiffTagNode) {
+        //for(int i = 0; i < tiffTagNode.get.getLength(); i++){
+        NodeList childrenNodeList = tiffTagNode.getChildNodes();
+        if (childrenNodeList != null) {
+            for (int i = 0; i < childrenNodeList.getLength(); i++) {
+
+                // TIFFIFD
+                Node tiffIFDNodeList = childrenNodeList.item(i);
+
+                NodeList tiffFieldNodeList = tiffIFDNodeList.getChildNodes();
+                for (int j = 0; j < tiffFieldNodeList.getLength(); j ++) {
+                    Node nNode = tiffFieldNodeList.item(j);
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                        Element elem = (Element) nNode;
+                        System.out.println(elem.getNodeName());
+                        // tag name
+                        System.out.println(elem.getAttribute("name"));
+
+
+                        Element value = (Element) nNode.getChildNodes().item(0).getFirstChild();
+                        System.out.println(value.getAttribute("value"));
+
+
+                        TiffTag tiffTag = new TiffTag(elem.getAttribute("name"), value.getAttribute("value"));
+
+                        tagTableViewList.add(tiffTag);
+                    }
+                }
+            }
         }
     }
 }

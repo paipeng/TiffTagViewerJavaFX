@@ -70,13 +70,7 @@ public class TiffTagViewerViewController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(((Node) mouseEvent.getTarget()).getScene().getWindow());
         if (selectedFile != null) {
             logger.info("selected file: " + selectedFile.getAbsolutePath());
-            String imagePath = selectedFile.getAbsolutePath();
-            //drawImage(imagePath);
-            //fileNameLists.add(imagePath);
-
-            TiffUtils.readTiffTag(imagePath);
-
-            updateTiffTagTableView();
+            updateTiffTagTableView(selectedFile.getAbsolutePath());
         }
     }
 
@@ -98,11 +92,13 @@ public class TiffTagViewerViewController implements Initializable {
         tiffTagTableView.getItems().clear();
     }
 
-    private void updateTiffTagTableView() {
+    private void updateTiffTagTableView(String imagePath) throws IOException {
         cleanTiffTagTableView();
 
-        TiffTag tiffTag = new TiffTag("test", "123");
-        tiffTagTableView.getItems().add(tiffTag);
+        TiffUtils.updateTableView(tiffTagTableView.getItems(), TiffUtils.readTiffTag(imagePath));
+
+//        TiffTag tiffTag = new TiffTag("test", "123");
+//        tiffTagTableView.getItems().add(tiffTag);
 
     }
 }
